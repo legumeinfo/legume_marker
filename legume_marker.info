@@ -1,0 +1,9 @@
+name = Legume Marker
+description = This is a Tripal extension module for legume databases that manages marker data housed in Chado. 
+core = 7.x
+version = 7.x-2.0.1-alpha
+package = Tripal Extensions 
+configure = admin/tripal/legume/legume_marker
+dependencies[] = tripal_core
+dependencies[] = tripal_feature
+dependencies[] = tripal_views

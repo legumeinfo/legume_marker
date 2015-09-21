@@ -1,0 +1,46 @@
+array (
+  'table' => 'marker_search',
+  'fields' => array(
+    'organism' => array(
+      'type' => 'text',
+      'not null' => TRUE,
+    ),
+    'organism_nid' => array(
+      'type' => 'int',
+      'not null' => TRUE,
+    ),
+    'cmarker' => array(
+      'type' => 'varchar',
+      'length' =>255,
+      'not null' => TRUE,
+    ),
+    'cmarker_id' => array(
+      'type' => 'int',
+      'NOT NULL' => TRUE,
+    ),
+    'cmarker_nid' => array(
+      'type' => 'int',
+      'not null' => TRUE,
+    ),
+    'markers' => array(
+      'type' => 'text',
+      'not null' => FALSE,
+    ),
+    'marker_ids' => array(
+      'type' => 'text',
+      'not null' => FALSE,
+    ),
+    'synonyms' => array(
+      'type' => 'text',
+      'not null' => FALSE,
+    ),
+    'all_names' => array(
+      'type' => 'text',
+      'not null' => FALSE,
+    ),
+  ),
+  'indexes' => array(
+    'QTL_search_indx0' => array('organism'),
+    'QTL_search_indx2' => array('cmarker'),
+  ),
+)

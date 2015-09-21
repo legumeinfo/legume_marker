@@ -1,0 +1,243 @@
+array (
+  'table' => 'marker_search',
+  'name' => 'marker_search',
+  'type' => 'chado',
+  'description' => '',
+  'priority' => '-1',
+  'base_table' => '1',
+  'fields' => array (
+    'organism' => array (
+      'name' => 'organism',
+      'title' => 'Organism',
+      'description' => 'Organism name',
+      'type' => 'text',
+      'handlers' => array (
+        'filter' => array (
+          'name' => 'tripal_views_handler_filter_select_string',
+        ),
+        'field' => array (
+          'name' => 'views_handler_field',
+        ),
+        'sort' => array (
+          'name' => 'views_handler_sort',
+        ),
+        'argument' => array (
+          'name' => 'views_handler_argument_string',
+        ),
+        'relationship' => array (
+          'name' => 'views_handler_relationship',
+        ),
+      ),
+      'joins' => array (
+      ),
+    ),
+
+    'organism_nid' => array (
+      'name' => 'organism_nid',
+      'title' => 'organism_nid',
+      'description' => 'Organism nid',
+      'type' => 'int',
+      'handlers' => array (
+        'filter' => array (
+          'name' => 'views_handler_filter_numeric',
+        ),
+        'field' => array (
+          'name' => 'views_handler_field_numeric',
+        ),
+        'sort' => array (
+          'name' => 'views_handler_sort',
+        ),
+        'argument' => array (
+          'name' => 'views_handler_argument_numeric',
+        ),
+        'relationship' => array (
+          'name' => 'views_handler_relationship',
+        ),
+      ),
+      'joins' => array (
+      ),
+    ),
+
+    'cmarker' => array (
+      'name' => 'cmarker',
+      'title' => 'Marker',
+      'description' => 'Marker',
+      'type' => 'text',
+      'handlers' => array (
+        'filter' => array (
+          'name' => 'tripal_views_handler_filter_select_string',
+        ),
+        'field' => array (
+          'name' => 'views_handler_field',
+        ),
+        'sort' => array (
+          'name' => 'views_handler_sort',
+        ),
+        'argument' => array (
+          'name' => 'views_handler_argument_string',
+        ),
+        'relationship' => array (
+          'name' => 'views_handler_relationship',
+        ),
+      ),
+      'joins' => array (
+      ),
+    ),
+
+    'cmarker_nid' => array (
+      'name' => 'cmarker_nid',
+      'title' => 'cmarker_nid',
+      'description' => 'Marker nid',
+      'type' => 'int',
+      'handlers' => array (
+        'filter' => array (
+          'name' => 'views_handler_filter_numeric',
+        ),
+        'field' => array (
+          'name' => 'views_handler_field_numeric',
+        ),
+        'sort' => array (
+          'name' => 'views_handler_sort',
+        ),
+        'argument' => array (
+          'name' => 'views_handler_argument_numeric',
+        ),
+        'relationship' => array (
+          'name' => 'views_handler_relationship',
+        ),
+      ),
+      'joins' => array (
+      ),
+    ),
+
+    'cmarker_id' => array (
+      'name' => 'cmarker_id',
+      'title' => 'cmarker_id',
+      'description' => 'Marker id',
+      'type' => 'int',
+      'handlers' => array (
+        'filter' => array (
+          'name' => 'views_handler_filter_numeric',
+        ),
+        'field' => array (
+          'name' => 'views_handler_field_numeric',
+        ),
+        'sort' => array (
+          'name' => 'views_handler_sort',
+        ),
+        'argument' => array (
+          'name' => 'views_handler_argument_numeric',
+        ),
+        'relationship' => array (
+          'name' => 'views_handler_relationship',
+        ),
+      ),
+      'joins' => array (
+      ),
+    ),
+
+    'markers' => array (
+      'name' => 'markers',
+      'title' => 'Associated Markers',
+      'description' => 'List of associated markers, typically, marker-loci',
+      'type' => 'text',
+      'handlers' => array (
+        'filter' => array (
+          'name' => 'views_handler_filter_string',
+        ),
+        'field' => array (
+          'name' => 'views_handler_field',
+        ),
+        'sort' => array (
+          'name' => 'views_handler_sort',
+        ),
+        'argument' => array (
+          'name' => 'views_handler_argument_string',
+        ),
+        'relationship' => array (
+          'name' => 'views_handler_relationship',
+        ),
+      ),
+      'joins' => array (
+      ),
+    ),
+
+    'marker_ids' => array (
+      'name' => 'marker_ids',
+      'title' => 'IDs for Associated Markers',
+      'description' => 'List of associated marker IDs, typically, marker-loci',
+      'type' => 'text',
+      'handlers' => array (
+        'filter' => array (
+          'name' => 'views_handler_filter_string',
+        ),
+        'field' => array (
+          'name' => 'views_handler_field',
+        ),
+        'sort' => array (
+          'name' => 'views_handler_sort',
+        ),
+        'argument' => array (
+          'name' => 'views_handler_argument_string',
+        ),
+        'relationship' => array (
+          'name' => 'views_handler_relationship',
+        ),
+      ),
+      'joins' => array (
+      ),
+    ),
+
+    'synonyms' => array (
+      'name' => 'synonyms',
+      'title' => 'Marker synonyms',
+      'description' => 'List of marker synonyms',
+      'type' => 'text',
+      'handlers' => array (
+        'filter' => array (
+          'name' => 'views_handler_filter_string',
+        ),
+        'field' => array (
+          'name' => 'views_handler_field',
+        ),
+        'sort' => array (
+          'name' => 'views_handler_sort',
+        ),
+        'argument' => array (
+          'name' => 'views_handler_argument_string',
+        ),
+        'relationship' => array (
+          'name' => 'views_handler_relationship',
+        ),
+      ),
+      'joins' => array (
+      ),
+    ),  
+
+    'all_names' => array (
+      'name' => 'all_names',
+      'title' => 'All marker names',
+      'description' => 'List of all known marker names',
+      'type' => 'text',
+      'handlers' => array (
+        'filter' => array (
+          'name' => 'views_handler_filter_string',
+        ),
+        'field' => array (
+          'name' => 'views_handler_field',
+        ),
+        'sort' => array (
+          'name' => 'views_handler_sort',
+        ),
+        'argument' => array (
+          'name' => 'views_handler_argument_string',
+        ),
+        'relationship' => array (
+          'name' => 'views_handler_relationship',
+        ),
+      ),
+      'joins' => array (
+      ),
+    ),  
+  ),
+)

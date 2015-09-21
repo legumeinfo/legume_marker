@@ -1,0 +1,34 @@
+<?php
+/**
+ * @file
+ * This file contains all Drupal hooks for the module other than any
+ * node hooks and block hooks. Those go in the [module name].chado_node.inc file
+ * and [module_name].blocks.inc respectively
+ *
+ * @ingroup legume_marker
+ */
+
+require_once('includes/legume_marker.chado_node.inc');
+require_once 'includes/legume_marker.marker_search.inc';
+require_once 'includes/legume_marker.views.inc';
+
+function legume_marker_theme($existing, $type, $theme, $path) {
+  $path = drupal_get_path('module', 'legume_marker');
+
+  $items = array(
+    'tripal_feature_marker_base' => array(
+      'variables' => array('node' => NULL),
+      'template' => 'tripal_feature_marker_base',
+      'path' => "$path/theme/templates",
+    ),
+
+    'tripal_feature_marker_positions' => array(
+      'variables' => array('node' => NULL),
+      'template' => 'tripal_feature_marker_positions',
+      'path' => "$path/theme/templates",
+    ),
+
+  );
+
+  return $items;
+}
