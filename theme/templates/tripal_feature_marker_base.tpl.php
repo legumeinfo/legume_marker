@@ -3,6 +3,10 @@
   $feature_id = $feature->feature_id;
 //echo "<pre>";var_dump($feature);echo "</pre>";
   
+  // Always want to expand joins as arrays regardless of how many matches
+  //   there are
+  $table_options = array('return_array' => true);
+  
   // Get all markers and synonyms related to this marker
   $sql = "SELECT * FROM chado.marker_search WHERE cmarker_id=$feature_id";
   if ($res = chado_query($sql, array())) {
@@ -25,17 +29,23 @@
       array_push($marker_types, $row->name);
     }
   }
-  $marker_type = implode(', ', $marker_types);
+  if (count($marker_type) > 0) {
+    $marker_type = implode(', ', $marker_types);
+  }
+  else {
+    $marker_type = 'unknown';
+  }
   
   // Get properties
   $properties = array();
-  $feature = chado_expand_var($feature, 'table', 'featureprop');
+  $feature = chado_expand_var($feature, 'table', 'featureprop', $table_options);
+//echo "<br>expanded feature: <pre>";var_dump($feature);echo "</pre>";
   $props = $feature->featureprop;
   foreach ($props as $prop){
-//echo "<pre>";var_dump($prop);echo "</pre>";
     $prop = chado_expand_var($prop, 'field', 'featureprop.value');
     $properties[$prop->type_id->name] = $prop->value;
   }
+//echo "<pre>";var_dump($props);echo "</pre>";
   
   // Get maps
   $maps = array();
@@ -119,16 +129,16 @@
       INNER JOIN chado.feature_pub fp
         ON fp.feature_id=ms.cmarker_id 
           OR fp.feature_id::text=ANY(STRING_TO_ARRAY(ms.marker_ids, ','))
-      RIGHT OUTER JOIN chado.featurepos pos
+      LEFT OUTER JOIN chado.featurepos pos
         ON pos.feature_id=ms.cmarker_id 
            OR pos.feature_id::text=ANY(STRING_TO_ARRAY(ms.marker_ids, ','))
-      RIGHT OUTER JOIN chado.featuremap fm 
+      LEFT OUTER JOIN chado.featuremap fm 
         ON fm.featuremap_id=pos.featuremap_id
-      RIGHT OUTER JOIN chado.featuremap_pub fmp 
+      LEFT OUTER JOIN chado.featuremap_pub fmp 
         ON fmp.featuremap_id=fm.featuremap_id
-      RIGHT OUTER JOIN chado.pub p 
+      LEFT OUTER JOIN chado.pub p 
         ON p.pub_id=fp.pub_id OR p.pub_id=fmp.pub_id
-      RIGHT OUTER JOIN public.chado_pub cp ON cp.pub_id=p.pub_id
+      LEFT OUTER JOIN public.chado_pub cp ON cp.pub_id=p.pub_id
     WHERE cmarker_id=$feature_id";
 //echo "<br>$sql<br>";
   if ($res=chado_query($sql)) {
@@ -165,6 +175,7 @@ $rows[] = array(
   ),
   $feature->name
 );
+
 // Synonyms, if any
 if (($marker->synonyms && $marker->synonyms != '{}')
       || ($marker->markers && $marker->markers != '{}')) {
@@ -173,6 +184,13 @@ if (($marker->synonyms && $marker->synonyms != '{}')
                   explode(',', preg_replace('/[\{\}]/', '', $marker->synonyms)),
                   explode(',', preg_replace('/[\{\}]/', '', $marker->markers)))
   );
+  // messy, but might be blank synonyms
+  for ($i=0;$i<count($synonyms); $i++) {
+    if ($synonyms[$i] == '') {
+      unset($synonyms[$i]);
+      $i--;
+    }
+  }
   $rows[] = array(
     array(
       'data' => 'Synonyms',
@@ -181,6 +199,7 @@ if (($marker->synonyms && $marker->synonyms != '{}')
     implode(', ', $synonyms),
   );
 }
+
 // Type row
 $rows[] = array(
   array(
@@ -189,21 +208,27 @@ $rows[] = array(
   ),
   $marker_type
 );
+
 // Linkout (if exits)
-$feature = chado_expand_var($feature, 'table', 'feature_dbxref');
+$feature = chado_expand_var($feature, 'table', 'feature_dbxref', $table_options);
 $dbxref = $feature->feature_dbxref->dbxref_id;
 //echo "<pre>";var_dump($dbxref);echo "</pre>";
 if ($dbxref) {
   $url = $dbxref->db_id->urlprefix . $dbxref->accession;
-  $rows[] = array(
-    array(
-      'data' => 'Accession',
-      'header' => TRUE,
-      'width' => '20%',
-    ),
-    "<a href=\"$url\">" . $dbxref->accession . "</a>",
-  );
+  $acc_text = "<a href=\"$url\">" . $dbxref->accession . "</a>";
 }
+else {
+  $acc_text = "n/a";
+}
+$rows[] = array(
+  array(
+    'data' => 'Accession',
+    'header' => TRUE,
+    'width' => '20%',
+  ),
+  $acc_text,
+);
+
 // Organism row
 $organism = $feature->organism_id->genus 
           . " " . $feature->organism_id->species 
@@ -223,7 +248,8 @@ $rows[] = array(
   $organism
 );
 
-// Repeat motif (if exists)
+// Repeat motif (if applicable and exists)
+//TODO: can marker type be tested for relevance of repeat motif?
 $key = 'Repeat Motif';
 if (array_key_exists($key, $properties)) {
   $rows[] = array(
@@ -243,6 +269,7 @@ $rows[] = array(
   ),
   $properties['Source Description'],
 );
+
 // Sequence rows
 if ($feature->seqlen > 0) {
   $rows[] = array(
@@ -253,25 +280,41 @@ if ($feature->seqlen > 0) {
     $feature->seqlen . 'bp'
   );
   $feature = chado_expand_var($feature, 'field', 'feature.residues');
-  // construct the definition line
-  $defline = '>' . 
-             $feature->uniquename . " " . 
-             'ID=' . $feature->uniquename . "|" .
-             'Name=' . $feature->name . "|" . 
-             'organism=' . $feature->organism_id->genus . " " . $feature->organism_id->species .  "|" .
-             'type=' . $marker_type; 
-  $sequence = str_split($feature->residues, 80);
+  $sequence = 'unknown';
+  if ($feature->residues && $feature->residues != 'NULL') {
+    // construct the definition line
+    $defline = '>' . 
+               $feature->uniquename . " " . 
+               'ID=' . $feature->uniquename . "|" .
+               'Name=' . $feature->name . "|" . 
+               'organism=' . $feature->organism_id->genus . " " . $feature->organism_id->species .  "|" .
+               'type=' . $marker_type; 
+    $sequences = str_split($feature->residues, 80);
+    $sequence = "<pre>$defline\n" . implode('<br>', $sequences) . "</pre>";
+  }
   $rows[] = array(
     array(
       'data' => 'Sequence',
       'header' => TRUE,
     ),
-    "<pre>$defline\n" . implode('<br>', $sequence) . "</pre>",
+    $sequence,
   );
 }
-// Primer rows
+else {
+//TODO: sequence isn't always relevant: how to determine?
+  $rows[] = array(
+    array(
+      'data' => 'Sequence',
+      'header' => TRUE,
+    ),
+    'unknown'
+  );
+}
+
+//TODO: how to determine if primers are relevant?
+// Primer rows (if any exist)
 $primers = array();
-$feature = chado_expand_var($feature, 'table', 'feature_relationship');
+$feature = chado_expand_var($feature, 'table', 'feature_relationship', $table_options);
 $related_features = $feature->feature_relationship->object_id;
 foreach ($related_features as $related_feature) {
   $subject = $related_feature->subject_id;
@@ -321,18 +364,16 @@ $rows[] = array(
   implode($pubs, '<br>'),
 );
 
-
-// Comment (if exists)
-$key = 'comment';
-if (array_key_exists($key, $properties)) {
-  $rows[] = array(
-    array(
-      'data' => $key,
-      'colspan' => 2
-    ),
-    $properties[$key],
-  );
-}
+// Comments
+$comments = (array_key_exists('comment', $properties))
+            ? $properties['comment'] : '';
+$rows[] = array(
+  array(
+    'data' => 'Comments',
+    'header' => TRUE,
+  ),
+  $properties['comment'],
+);
 
 // allow site admins to see the feature ID
 if (user_access('view ids')) { 
