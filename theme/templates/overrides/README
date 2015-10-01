@@ -1,1 +1,4 @@
 These files go in the theme directory.
+
+WARNING: there may be a file checked in to the theme repository that overrides
+this file.
