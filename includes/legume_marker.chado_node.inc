@@ -35,12 +35,13 @@ function legume_marker_node_view($node, $view_mode, $langcode) {
           '#tripal_toc_title' => 'Marker Overview',
           '#weight' => -100,
         );
-        
+/*        
         $node->content['tripal_feature_relationships'] = array(
           '#markup' => theme('tripal_feature_marker_positions', array('node' => $node)),
           '#tripal_toc_id'    => 'positions',
           '#tripal_toc_title' => 'Marker Positions',
         );
+*/
         $node->content['tripal_feature_marker_positions'] = array(
           '#markup' => theme('tripal_feature_marker_positions', array('node' => $node)),
           '#tripal_toc_id'    => 'positions',
