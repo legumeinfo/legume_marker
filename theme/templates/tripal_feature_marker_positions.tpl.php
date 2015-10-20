@@ -1,6 +1,7 @@
 <?php
   $feature  = $variables['node']->feature;
   $feature_id = $feature->feature_id;
+//echo "feature: <pre>";var_dump($feature);echo "</pre>";    
  
   // Always want to expand joins as arrays regardless of how many matches
   //   there are
@@ -8,35 +9,40 @@
 
 
   /////// Get information about physical position ///////
-  
+  $feature = chado_expand_var($feature, 'table', 'featureloc', $table_options);
+//echo "featureloc: <pre>";var_dump($feature->featureloc->feature_id);echo "</pre>";   
+  $featurelocs = $feature->featureloc->feature_id;
   $phys_pos = array();
-  foreach ($feature->all_featurelocs as $featureloc) {
+  foreach ($featurelocs as $featureloc) {
 //echo "featureloc: <pre>";var_dump($featureloc);echo "</pre>";
     // get linkage group and version
-    $srcfeature = $featureloc->record->srcfeature_id;
+    $srcfeature = $featureloc->srcfeature_id;
 //echo "srcfeature: <pre>";var_dump($srcfeature);echo "</pre>";    
     $sql = "
-      SELECT a.name FROM chado.feature f
+      SELECT a.name, a.analysis_id FROM chado.feature f
         INNER JOIN chado.analysisfeature af ON af.feature_id=f.feature_id
         INNER JOIN chado.analysis a ON a.analysis_id=af.analysis_id
       WHERE f.feature_id=" . $srcfeature->feature_id;
 //echo "$sql<br>";
     if ($res=chado_query($sql)) {
       $row = $res->fetchObject();
+//echo "row: <pre>";var_dump($row);echo "</pre>";    
       
       // Get GBrowse link
       $srcfeature = chado_expand_var($srcfeature, 'table', 'featureprop', $table_options);
       $props = $srcfeature->featureprop;
+//echo "props: <pre>";var_dump($props);echo "</pre>";    
       foreach ($props as $prop){
         if ($prop->type_id->name == 'Browser Track Name') {
           $pos['track_name'] = $prop->value;
         }
       }
 
-      $pos['chr']   = $srcfeature->name;
-      $pos['ver']   = $row->name;
-      $pos['start'] = $featureloc->fmin;
-      $pos['end']   = $featureloc->fmax;
+      $pos['chr']    = $srcfeature->name;
+      $pos['ver']    = $row->name;
+      $pos['ver_id'] = $row->analysis_id;
+      $pos['start']  = $featureloc->fmin;
+      $pos['end']    = $featureloc->fmax;
       array_push($phys_pos, $pos);
     }
   }//all featureloc records
@@ -47,6 +53,7 @@
     $pos_table = 'physical position unknown';
   }
   else {
+    $gbrowse_url = getGBrowseURL($srcfeature->organism_id);
     $pos_table = "
       <table>
         <tr>
@@ -54,18 +61,25 @@
           <td><b>Chromosome</b></td>
           <td><b>Start</b></td>
           <td><b>End</b></td>
+<!--          <td><b>View Position</b></td>-->
         </tr>";
     foreach ($phys_pos as $pos) {
-//TODO: get GBrowse link from db
-//      $ver = (isset($pos['track_name']) 
-//           ?  '<a href="' .
-$ver = $pos['ver'];
+      $gbrowse = false;
+      if (isset($pos['track_name']) && $gbrowse_url) { 
+        $gbrowse = "[<a href=\"$gbrowse_url?ref=" . $pos['track_name'] 
+                 . ";start=" . $pos['start']
+                 . ";end=" . $pos['end']
+                 . "\">GBrowse</a>]"; 
+      }
+      $ver = "<a href=\"/analysis/" .  $pos['ver_id'] . "\">"
+           . $pos['ver'] . "</a>";
       $pos_table .= "
         <tr>
           <td>$ver</td>
-          <td>" . $pos['chr'] . "</td>
+          <td>" . $pos['chr']   . "</td>
           <td>" . $pos['start'] . "</td>
-          <td>" . $pos['end'] . "</td>
+          <td>" . $pos['end']   . "</td>
+<!--          <td>$gbrowse</td> -->
         </tr>";
     }//each physical position
     $pos_table .= "
@@ -185,3 +199,11 @@ $table = array(
 // once we have our table array structure defined, we call Drupal's theme_table()
 // function to generate the table.
 print theme_table($table); 
+
+
+
+//TODO: VERY TEMPORARY!
+//      move this to website-specific module
+function getGBrowseURL($organism_id) {
+  return "/gbrowse_phavu1.0";
+}//getGBrowseURL

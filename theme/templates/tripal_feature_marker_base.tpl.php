@@ -303,14 +303,14 @@
   
   // Maps
   if (count($maps) == 0) {
-    $html = "This marker is not placed on any maps";
+    $html = "This marker has not placed on any genetic maps";
   }
   else {
     $html = "<table><tr>" . implode($maps, '</tr><tr>') . "</tr></table>";
   }
   $rows[] = array(
     array(
-      'data' => 'Map(s)',
+      'data' => 'Genetic Map(s)',
       'header' => TRUE
     ),
     $html,
