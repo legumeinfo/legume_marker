@@ -61,15 +61,13 @@
           <td><b>Chromosome</b></td>
           <td><b>Start</b></td>
           <td><b>End</b></td>
-<!--          <td><b>View Position</b></td>-->
+          <td><b>View Position</b></td>
         </tr>";
     foreach ($phys_pos as $pos) {
       $gbrowse = false;
       if (isset($pos['track_name']) && $gbrowse_url) { 
-        $gbrowse = "[<a href=\"$gbrowse_url?ref=" . $pos['track_name'] 
-                 . ";start=" . $pos['start']
-                 . ";end=" . $pos['end']
-                 . "\">GBrowse</a>]"; 
+        $params = makeGBrowseParams($feature, $pos);
+        $gbrowse = "[<a href=\"$gbrowse_url$params\">GBrowse</a>]"; 
       }
       $ver = "<a href=\"/analysis/" .  $pos['ver_id'] . "\">"
            . $pos['ver'] . "</a>";
@@ -79,7 +77,7 @@
           <td>" . $pos['chr']   . "</td>
           <td>" . $pos['start'] . "</td>
           <td>" . $pos['end']   . "</td>
-<!--          <td>$gbrowse</td> -->
+          <td>$gbrowse</td> 
         </tr>";
     }//each physical position
     $pos_table .= "
@@ -112,9 +110,9 @@
           INNER JOIN chado.feature lg ON lg.feature_id=fp.map_feature_id
           INNER JOIN chado.featuremap m ON m.featuremap_id=fp.featuremap_id
           INNER JOIN public.chado_featuremap as cf ON cf.featuremap_id=m.featuremap_id
-          RIGHT OUTER JOIN chado.feature_dbxref lgdx ON lgdx.feature_id=lg.feature_id
-          RIGHT OUTER JOIN chado.dbxref lgx ON lgx.dbxref_id=lgdx.dbxref_id
-          RIGHT OUTER JOIN chado.db lgdb ON lgdb.db_id=lgx.db_id
+          LEFT OUTER JOIN chado.feature_dbxref lgdx ON lgdx.feature_id=lg.feature_id
+          LEFT OUTER JOIN chado.dbxref lgx ON lgx.dbxref_id=lgdx.dbxref_id
+          LEFT OUTER JOIN chado.db lgdb ON lgdb.db_id=lgx.db_id
         WHERE fp.feature_id=$feature_id AND fp.featuremap_id=$map_id";
       if ($pos_res=chado_query($sql)) {
         while ($pos_row=$pos_res->fetchObject()) {
@@ -207,3 +205,17 @@ print theme_table($table);
 function getGBrowseURL($organism_id) {
   return "/gbrowse_phavu1.0";
 }//getGBrowseURL
+
+
+function makeGBrowseParams($feature, $pos) {
+  $start = ($pos['start'] > 500) ? $pos['start'] : 0;
+  $end = $pos['end'] + 500;
+  // ?query=ref=Pv09;start=37365723;end=37365923;add=Pv09+Marker+BSn105_SNP+37365823..37365823
+  $params = '?query=ref=' . $pos['track_name'] 
+          . ";start=$start;stop=$end"
+          . ';add=' . $pos['track_name'] . '+Marker'
+          . '+' . $feature->name 
+          . '+' . $pos['start'] . '..' . $pos['end']
+          . ';h_feat=' . $feature->name; 
+  return $params;
+}//makeGBrowseParams
