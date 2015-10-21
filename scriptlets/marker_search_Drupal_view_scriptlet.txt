@@ -288,7 +288,7 @@
           'All' => 'All',
         ),
         'group' => '0',
-        'exposed' => TRUE,
+        'exposed' => FALSE,
         'expose' => array(
           'use_operator' => 0,
           'operator' => 'organism_op',
