@@ -210,12 +210,12 @@ function getGBrowseURL($organism_id) {
 function makeGBrowseParams($feature, $pos) {
   $start = ($pos['start'] > 500) ? $pos['start'] : 0;
   $end = $pos['end'] + 500;
-  // ?query=ref=Pv09;start=37365723;end=37365923;add=Pv09+Marker+BSn105_SNP+37365823..37365823
+  // ?query=ref=Pv09;start=37365723;end=37365923;add=Pv09+Marker+BSn105_SNP+37365823..37365823;h_feat=BSn105_SNP@red;style=Marker+bgcolor=blue
   $params = '?query=ref=' . $pos['track_name'] 
           . ";start=$start;stop=$end"
           . ';add=' . $pos['track_name'] . '+Marker'
           . '+' . $feature->name 
           . '+' . $pos['start'] . '..' . $pos['end']
-          . ';h_feat=' . $feature->name; 
+          . ';h_feat=' . $feature->name . '@yellow;style=Marker+bgcolor=red'; 
   return $params;
 }//makeGBrowseParams
