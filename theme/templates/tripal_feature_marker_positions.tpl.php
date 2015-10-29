@@ -16,34 +16,32 @@
   foreach ($featurelocs as $featureloc) {
 //echo "featureloc: <pre>";var_dump($featureloc);echo "</pre>";
     // get linkage group and version
-    $srcfeature = $featureloc->srcfeature_id;
+    if ($srcfeature = $featureloc->srcfeature_id) {
 //echo "srcfeature: <pre>";var_dump($srcfeature);echo "</pre>";    
-    $sql = "
-      SELECT a.name, a.analysis_id FROM chado.feature f
-        INNER JOIN chado.analysisfeature af ON af.feature_id=f.feature_id
-        INNER JOIN chado.analysis a ON a.analysis_id=af.analysis_id
-      WHERE f.feature_id=" . $srcfeature->feature_id;
-//echo "$sql<br>";
-    if ($res=chado_query($sql)) {
-      $row = $res->fetchObject();
-//echo "row: <pre>";var_dump($row);echo "</pre>";    
+      $sql = "
+        SELECT a.name, a.analysis_id FROM chado.feature f
+          INNER JOIN chado.analysisfeature af ON af.feature_id=f.feature_id
+          INNER JOIN chado.analysis a ON a.analysis_id=af.analysis_id
+        WHERE f.feature_id=" . $srcfeature->feature_id;
+      if ($res=chado_query($sql)) {
+        $row = $res->fetchObject();
       
-      // Get GBrowse link
-      $srcfeature = chado_expand_var($srcfeature, 'table', 'featureprop', $table_options);
-      $props = $srcfeature->featureprop;
-//echo "props: <pre>";var_dump($props);echo "</pre>";    
-      foreach ($props as $prop){
-        if ($prop->type_id->name == 'Browser Track Name') {
-          $pos['track_name'] = $prop->value;
+        // Get GBrowse link
+        $srcfeature = chado_expand_var($srcfeature, 'table', 'featureprop', $table_options);
+        $props = $srcfeature->featureprop;
+        foreach ($props as $prop){
+          if ($prop->type_id->name == 'Browser Track Name') {
+            $pos['track_name'] = $prop->value;
+          }
         }
+  
+        $pos['chr']    = $srcfeature->name;
+        $pos['ver']    = $row->name;
+        $pos['ver_id'] = $row->analysis_id;
+        $pos['start']  = $featureloc->fmin;
+        $pos['end']    = $featureloc->fmax;
+        array_push($phys_pos, $pos);
       }
-
-      $pos['chr']    = $srcfeature->name;
-      $pos['ver']    = $row->name;
-      $pos['ver_id'] = $row->analysis_id;
-      $pos['start']  = $featureloc->fmin;
-      $pos['end']    = $featureloc->fmax;
-      array_push($phys_pos, $pos);
     }
   }//all featureloc records
 //echo "phys positions: <pre>";var_dump($phys_pos);echo "</pre>";    

@@ -79,9 +79,11 @@
           WHERE featuremap_id=" . $all_map_ids[$i];
         if ($cmap_res = chado_query($sql)) {
           $cmap_row = $cmap_res->fetchObject();
-          $url = $cmap_row->urlprefix . $cmap_row->accession;
-          // don't use l() here; it url-encodes chars we need in the CMap url
-          $map_html .= " [<a href=\"$url\">CMap</a>]";
+          if ($cmap_row->urlprefix) {
+            $url = $cmap_row->urlprefix . $cmap_row->accession;
+            // don't use l() here; it url-encodes chars we need in the CMap url
+            $map_html .= " [<a href=\"$url\">CMap</a>]";
+          }
         }//handle CMap link
         
         $map_html .= "</td><td>";
