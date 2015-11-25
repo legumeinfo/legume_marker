@@ -209,8 +209,8 @@
 
   // Linkout (if exits)
   $feature = chado_expand_var($feature, 'table', 'feature_dbxref', $table_options);
-  $dbxref = $feature->feature_dbxref->dbxref_id;
-  //echo "<pre>";var_dump($dbxref);echo "</pre>";
+  $dbxref = $feature->dbxref_id;
+//echo "<pre>";var_dump($dbxref);echo "</pre>";
   if ($dbxref) {
     $url = $dbxref->db_id->urlprefix . $dbxref->accession;
     $acc_text = "<a href=\"$url\">" . $dbxref->accession . "</a>";
