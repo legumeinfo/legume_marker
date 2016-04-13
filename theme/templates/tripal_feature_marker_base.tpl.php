@@ -210,8 +210,8 @@
   // Linkout (if exits)
   $feature = chado_expand_var($feature, 'table', 'feature_dbxref', $table_options);
   $dbxref = $feature->feature_dbxref[0]->dbxref_id;
-//echo "FEATURE: <pre>";var_dump($feature);echo "</pre>";
-  if ($dbxref) {
+echo "FEATURE: <pre>";var_dump($dbxref);echo "</pre>";
+  if ($dbxref && strstr($dbxref->db_id->name, 'genbank')) {
     $url = $dbxref->db_id->urlprefix . $dbxref->accession;
     $acc_text = "<a href=\"$url\">" . $dbxref->accession . "</a>";
   }
