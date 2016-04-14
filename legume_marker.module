@@ -9,8 +9,8 @@
  */
 
 require_once('includes/legume_marker.chado_node.inc');
-require_once 'includes/legume_marker.marker_search.inc';
-require_once 'includes/legume_marker.views.inc';
+//require_once 'includes/legume_marker.marker_search.inc';
+//require_once 'includes/legume_marker.views.inc';
 
 function legume_marker_theme($existing, $type, $theme, $path) {
   $path = drupal_get_path('module', 'legume_marker');
