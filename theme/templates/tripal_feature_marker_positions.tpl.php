@@ -87,7 +87,7 @@
   
   $pos_html = "This marker is not placed on any map.";
   $sql = "
-    SELECT cmarker, fm.name AS map, fm.featuremap_id AS map_id, 
+    SELECT DISTINCT cmarker, fm.name AS map, fm.featuremap_id AS map_id, 
            cfm.nid AS map_nid
     FROM chado.marker_search ms
       INNER JOIN chado.featurepos pos 
@@ -102,7 +102,7 @@
     while ($row=$res->fetchObject()) {
       $map_id = $row->map_id;
       $sql = "
-        SELECT m.name AS map, cf.nid, lg.name AS lg, lgx.accession, 
+        SELECT DISTINCT m.name AS map, cf.nid, lg.name AS lg, lgx.accession, 
                lgdb.urlprefix, fp.mappos 
         FROM chado.featurepos fp
           INNER JOIN chado.feature lg ON lg.feature_id=fp.map_feature_id
