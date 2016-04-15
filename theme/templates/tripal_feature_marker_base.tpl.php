@@ -117,35 +117,53 @@
     }
   }
 
-  // Publications
+  // Publications (marker which is primary)
+  $primary_pub = '';
+  $sql = "
+    SELECT uniquename FROM {pub} 
+    WHERE pub.pub_id=(SELECT pub_id FROM {feature_pub}
+                      WHERE feature_id=$feature_id)";
+  if ($res=chado_query($sql)) {
+    $row = $res->fetchObject();
+    $primary_pub = $row->uniquename;
+  }
+  
   $pubs = array();
   $sql = "
-    SELECT DISTINCT p.uniquename, cp.nid
-    FROM chado.marker_search ms
-      INNER JOIN chado.feature_pub fp
-        ON fp.feature_id=ms.cmarker_id 
-          OR fp.feature_id::text=ANY(STRING_TO_ARRAY(ms.marker_ids, ','))
-      LEFT OUTER JOIN chado.featurepos pos
-        ON pos.feature_id=ms.cmarker_id 
-           OR pos.feature_id::text=ANY(STRING_TO_ARRAY(ms.marker_ids, ','))
-      LEFT OUTER JOIN chado.featuremap fm 
-        ON fm.featuremap_id=pos.featuremap_id
-      LEFT OUTER JOIN chado.featuremap_pub fmp 
-        ON fmp.featuremap_id=fm.featuremap_id
-      LEFT OUTER JOIN chado.pub p 
-        ON p.pub_id=fp.pub_id OR p.pub_id=fmp.pub_id
-      LEFT OUTER JOIN public.chado_pub cp ON cp.pub_id=p.pub_id
-    WHERE cmarker_id=$feature_id";
+    SELECT uniquename, nid 
+  FROM
+    (SELECT DISTINCT p.uniquename, cp.nid
+     FROM chado.marker_search ms
+       INNER JOIN chado.feature_pub fp
+         ON fp.feature_id=ms.cmarker_id 
+            OR fp.feature_id::text=ANY(STRING_TO_ARRAY(ms.marker_ids, ','))
+       LEFT OUTER JOIN chado.featurepos pos
+         ON pos.feature_id=ms.cmarker_id 
+            OR pos.feature_id::text=ANY(STRING_TO_ARRAY(ms.marker_ids, ','))
+       LEFT OUTER JOIN chado.featuremap fm 
+         ON fm.featuremap_id=pos.featuremap_id
+       LEFT OUTER JOIN chado.featuremap_pub fmp 
+         ON fmp.featuremap_id=fm.featuremap_id
+       LEFT OUTER JOIN chado.pub p 
+         ON p.pub_id=fp.pub_id OR p.pub_id=fmp.pub_id
+       LEFT OUTER JOIN public.chado_pub cp ON cp.pub_id=p.pub_id
+     WHERE cmarker_id=$feature_id
+    ) pubsearch
+    ORDER BY uniquename ASC";
 //echo "<br>$sql<br>";
   if ($res=chado_query($sql)) {
     while ($row=$res->fetchObject()) {
       $url = '/node/' . $row->nid;  // NOTE: assumes all maps are sync-ed!
-      $pub_html = l($row->uniquename, $url);
-      $pubs[] = $pub_html;
+      if ($row->uniquename == $primary_pub) {
+        $pub_html = "Primary: " . l($row->uniquename, $url);
+        array_unshift($pubs, $pub_html); // put this one first
+      }
+      else {
+        $pub_html = l($row->uniquename, $url);
+        $pubs[] = $pub_html;
+      }
     }//each pub row
   }
-
-  // Check for physical position
   
 ?>
 
