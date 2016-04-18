@@ -32,3 +32,29 @@ function legume_marker_theme($existing, $type, $theme, $path) {
 
   return $items;
 }
+
+/**
+  * hook_form_alter
+  *
+  * Add a validator to the search form.
+  */
+function legume_marker_form_alter(&$form, &$form_state, $form_id) {
+//drupal_set_message("Form ID is: $form_id");
+  if ($form_id == 'views_exposed_form') {
+    $form['#validate'][] = 'legume_marker_form_validate';
+//drupal_set_message("Validation is set to " . var_export($form['#validate'], true));
+  }
+} 
+
+
+/**
+  * Form validator for search form. 
+  * Use this to trim whitespace from text fields.
+  */
+function legume_marker_form_validate($form, &$form_state) {
+drupal_set_message("Form values are " . var_export($form_state['values'], true));
+  $form_state['values']['marker_name'] = trim($form_state['values']['marker_name']);
+}
+
+
+
