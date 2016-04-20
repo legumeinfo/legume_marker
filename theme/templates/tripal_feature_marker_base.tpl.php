@@ -106,6 +106,10 @@
           $map_html .= " <b>linkage group:</b> " . $lg_row->lg;
           if ($lg_row->accession) {
             $url = $lg_row->urlprefix . $lg_row->accession;
+            // Construct CMap accession for marker
+            $highlight = urlencode('"' . str_replace('-', '_', $lg_row->lg)
+                                   . '_' . $feature->name . '"');
+            $url .= ";highlight=$highlight";
             // don't use l() here; it url-encodes chars we need in the CMap url
             $map_html .= " [<a href=\"$url\">CMap</a>]";
           }

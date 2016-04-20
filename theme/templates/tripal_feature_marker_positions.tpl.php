@@ -122,6 +122,10 @@
                    . $pos_row->mappos . "cM";
           if ($pos_row->accession) {
             $url = $pos_row->urlprefix . $pos_row->accession;
+            // Construct CMap accession for marker
+            $highlight = urlencode('"' . str_replace('-', '_', $pos_row->lg)
+                                   . '_' . $feature->name . '"');
+            $url .= ";highlight=$highlight";
             $one_row .= " [<a href=\"$url\">CMap</a>]";
           } 
           $pos_rows[] = $one_row;
