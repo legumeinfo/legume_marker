@@ -13,27 +13,6 @@
     $marker = $res->fetchObject();
   }
   
-  // Get marker type, if known
-  $marker_types = array();
-  $sql = "
-    SELECT c.name FROM chado.marker_search ms
-      INNER JOIN chado.feature_cvterm fc 
-        ON fc.feature_id=ms.cmarker_id 
-           OR fc.feature_id::text=ANY(STRING_TO_ARRAY(ms.marker_ids, ','))
-      INNER JOIN chado.cvterm c ON c.cvterm_id=fc.cvterm_id
-    WHERE cmarker_id=$feature_id";
-  if ($res = chado_query($sql, array())) {
-    while ($row=$res->fetchObject()) {
-      array_push($marker_types, $row->name);
-    }
-  }
-  if (count($marker_types) > 0) {
-    $marker_type = implode(', ', $marker_types);
-  }
-  else {
-    $marker_type = 'unknown';
-  }
-  
   // Get properties
   $properties = array();
   $feature = chado_expand_var($feature, 'table', 'featureprop', $table_options);
@@ -43,7 +22,32 @@
     $prop = chado_expand_var($prop, 'field', 'featureprop.value');
     $properties[$prop->type_id->name] = $prop->value;
   }
-//echo "<pre>";var_dump($props);echo "</pre>";
+//echo "<pre>";var_dump($properties);echo "</pre>";
+  
+  // Get marker type, if known. 
+  //    Use 'Marker Source' featureprop if set, otherwise use the SO term
+  $marker_type = 'unknown';
+  if (isset($properties['Marker Type'])) {
+    $marker_type = $properties['Marker Type'];
+  }
+  else {
+    $marker_types = array();
+    $sql = "
+      SELECT c.name FROM chado.marker_search ms
+        INNER JOIN chado.feature_cvterm fc 
+          ON fc.feature_id=ms.cmarker_id 
+             OR fc.feature_id::text=ANY(STRING_TO_ARRAY(ms.marker_ids, ','))
+        INNER JOIN chado.cvterm c ON c.cvterm_id=fc.cvterm_id
+      WHERE cmarker_id=$feature_id";
+    if ($res = chado_query($sql, array())) {
+      while ($row=$res->fetchObject()) {
+        array_push($marker_types, $row->name);
+      }
+    }
+    if (count($marker_types) > 0) {
+      $marker_type = implode(', ', $marker_types);
+    }
+  }
   
   // Get maps
   $maps = array();
