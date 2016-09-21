@@ -313,13 +313,6 @@
     foreach ($primers as $name => $primer) {
       $rows[] = array(
         array(
-          'data' => "Primer$count Name",
-          'header' => TRUE,
-        ),
-        $name,
-      );
-      $rows[] = array(
-        array(
           'data' => "Primer$count Sequence",
           'header' => TRUE,
         ),
