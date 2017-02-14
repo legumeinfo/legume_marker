@@ -51,7 +51,6 @@
     $pos_table = 'physical position unknown';
   }
   else {
-    $gbrowse_url = getGBrowseURL($srcfeature->organism_id);
     $pos_table = "
       <table>
         <tr>
@@ -62,13 +61,15 @@
           <td><b>View Position</b></td>
         </tr>";
     foreach ($phys_pos as $pos) {
-      $gbrowse = false;
-      if (isset($pos['track_name']) && $gbrowse_url) { 
+      $gbrowse = '';
+      if ($gbrowse_url=getGBrowseURL($pos['ver_id'])) {
         $params = makeGBrowseParams($feature, $pos);
         $gbrowse = "[<a href=\"$gbrowse_url$params\">GBrowse</a>]"; 
       }
+      
       $ver = "<a href=\"/analysis/" .  $pos['ver_id'] . "\">"
            . $pos['ver'] . "</a>";
+           
       $pos_table .= "
         <tr>
           <td>$ver</td>
@@ -201,23 +202,31 @@ $table = array(
 print theme_table($table); 
 
 
-
-//TODO: VERY TEMPORARY!
-//      move this to website-specific module
-function getGBrowseURL($organism_id) {
-  return "/gbrowse_phavu1.0";
+function getGBrowseURL($analysis_id) {
+  $sql = "
+    SELECT value FROM {analysisprop}
+    WHERE analysis_id=$analysis_id
+          AND type_id=(SELECT cvterm_id FROM {cvterm} WHERE name='GBrowse URL')";
+  if ($res=chado_query($sql)) {
+    $url_row=$res->fetchObject();
+    return $url_row->value;
+  }
+  
+  return false;
 }//getGBrowseURL
 
 
 function makeGBrowseParams($feature, $pos) {
-  $start = ($pos['start'] > 500) ? $pos['start'] : 0;
-  $end = $pos['end'] + 500;
+  $start = ($pos['start'] > 750) ? $pos['start']-750 : 0;
+  $end = $pos['end'] + 750;
   // ?query=ref=Pv09;start=37365723;end=37365923;add=Pv09+Marker+BSn105_SNP+37365823..37365823;h_feat=BSn105_SNP@red;style=Marker+bgcolor=blue
-  $params = '?query=ref=' . $pos['track_name'] 
+  $params = '?query=ref=' . $pos['chr'] 
           . ";start=$start;stop=$end"
-          . ';add=' . $pos['track_name'] . '+Marker'
+//          . ';add=' . $pos['track_name'] . '+Marker'
           . '+' . $feature->name 
           . '+' . $pos['start'] . '..' . $pos['end']
           . ';h_feat=' . $feature->name . '@yellow;style=Marker+bgcolor=red'; 
   return $params;
+
+//  return '?q=' . $feature->name;
 }//makeGBrowseParams
