@@ -223,6 +223,7 @@ function makeGBrowseParams($feature, $pos) {
   $params = '?query=ref=' . $pos['chr'] 
           . ";start=$start;stop=$end"
 //          . ';add=' . $pos['track_name'] . '+Marker'
+          . ';add=' . $pos['chr'] . '+Marker'
           . '+' . $feature->name 
           . '+' . $pos['start'] . '..' . $pos['end']
           . ';h_feat=' . $feature->name . '@yellow;style=Marker+bgcolor=red'; 
