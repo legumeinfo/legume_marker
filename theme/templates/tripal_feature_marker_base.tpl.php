@@ -125,17 +125,18 @@
     }
   }
 
-  // Publications (marker which is primary)
-  $primary_pub = '';
+  // Publications (mark which is primary; may be multiple)
+  $primary_pubs = array();
   $sql = "
     SELECT uniquename FROM {pub} 
-    WHERE pub.pub_id=(SELECT pub_id FROM {feature_pub}
+    WHERE pub.pub_id IN (SELECT pub_id FROM {feature_pub}
                       WHERE feature_id=$feature_id)";
   if ($res=chado_query($sql)) {
-    $row = $res->fetchObject();
-    $primary_pub = $row->uniquename;
+    while ($row = $res->fetchObject()) {
+      array_push($primary_pubs, $row->uniquename);
+    }
   }
-  
+
   $pubs = array();
   $sql = "
     SELECT uniquename, nid 
@@ -162,7 +163,7 @@
   if ($res=chado_query($sql)) {
     while ($row=$res->fetchObject()) {
       $url = '/node/' . $row->nid;  // NOTE: assumes all maps are sync-ed!
-      if ($row->uniquename == $primary_pub) {
+      if (in_array($row->uniquename, $primary_pubs)) {
         $pub_html = "Primary: " . l($row->uniquename, $url);
         array_unshift($pubs, $pub_html); // put this one first
       }
@@ -172,7 +173,6 @@
       }
     }//each pub row
   }
-  
 ?>
 
 <div class="tripal_feature-data-block-desc tripal-data-block-desc"></div> <?php
