@@ -4,6 +4,7 @@ core = 7.x
 version = 7.x-2.0.1-alpha
 package = Tripal Extensions 
 configure = admin/tripal/legume/legume_marker
+stylesheets[all][] = theme/css/legume_marker.css
 dependencies[] = tripal_core
 dependencies[] = tripal_feature
 dependencies[] = tripal_views
