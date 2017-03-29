@@ -294,29 +294,30 @@
     $properties['Source Description'],
   );
   
-  //TODO: how to determine if primers are relevant?
   // Primer rows (if any exist)
   $primers = array();
   $feature = chado_expand_var($feature, 'table', 'feature_relationship', $table_options);
   $related_features = $feature->feature_relationship->object_id;
+//echo "RELATED FEATURES:<pre>";var_dump($related_features);echo "</pre>";
   foreach ($related_features as $related_feature) {
     $subject = $related_feature->subject_id;
     if ($subject->type_id->name == 'primer') {
       $subject = chado_expand_var($subject, 'field', 'feature.residues');
-  //echo "<pre>";var_dump($subject);echo "</pre>";
+//echo "SUBJECT:<pre>";var_dump($subject);echo "</pre>";
       $primers[$subject->name] = $subject->residues;
     }
   }//each related feature
   ksort($primers);
   if (count($primers) > 0) {
     $count = 1;
+    $style = "style=margin:2px;padding:2px";
     foreach ($primers as $name => $primer) {
       $rows[] = array(
         array(
           'data' => "Primer$count Sequence",
           'header' => TRUE,
         ),
-        $primer,
+        "<pre $style>>$name\n$primer</pre>",
       );
       $count++;
     }//each primer

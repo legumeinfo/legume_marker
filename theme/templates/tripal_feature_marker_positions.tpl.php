@@ -19,9 +19,10 @@
     if ($srcfeature = $featureloc->srcfeature_id) {
 //echo "srcfeature: <pre>";var_dump($srcfeature);echo "</pre>";    
       $sql = "
-        SELECT a.name, a.analysis_id FROM chado.feature f
+        SELECT a.name, a.analysis_id, ca.nid FROM chado.feature f
           INNER JOIN chado.analysisfeature af ON af.feature_id=f.feature_id
           INNER JOIN chado.analysis a ON a.analysis_id=af.analysis_id
+          LEFT JOIN public.chado_analysis ca ON ca.analysis_id=a.analysis_id
         WHERE f.feature_id=" . $srcfeature->feature_id;
       if ($res=chado_query($sql)) {
         $row = $res->fetchObject();
