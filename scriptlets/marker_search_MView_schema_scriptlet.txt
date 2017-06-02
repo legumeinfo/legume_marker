@@ -38,6 +38,14 @@ array (
       'type' => 'text',
       'not null' => FALSE,
     ),
+    'pub_nid' => array(
+      'type' => 'int',
+      'not null' => FALSE,
+    ),
+    'citation' => array(
+      'type' => 'text',
+      'not null' => FALSE,
+    ),
   ),
   'indexes' => array(
     'QTL_search_indx0' => array('organism'),

@@ -239,5 +239,58 @@ array (
       'joins' => array (
       ),
     ),  
+
+    'pub_nid' => array (
+      'name' => 'pub_nid',
+      'title' => 'pub_nid',
+      'description' => 'pub_nid',
+      'type' => 'int',
+      'handlers' => array (
+        'filter' => array (
+          'name' => 'views_handler_filter_numeric',
+        ),
+        'field' => array (
+          'name' => 'views_handler_field_numeric',
+        ),
+        'sort' => array (
+          'name' => 'views_handler_sort',
+        ),
+        'argument' => array (
+          'name' => 'views_handler_argument_numeric',
+        ),
+        'relationship' => array (
+          'name' => 'views_handler_relationship',
+        ),
+      ),
+      'joins' => array (
+      ),
+    ),  
+
+    'citation' => array (
+      'name' => 'citation',
+      'title' => 'Publication Citation',
+      'description' => 'Publication Citation',
+      'type' => 'text',
+      'handlers' => array (
+        'filter' => array (
+          'name' => 'tripal_views_handler_filter_select_string',
+        ),
+        'field' => array (
+          'name' => 'views_handler_field',
+        ),
+        'sort' => array (
+          'name' => 'views_handler_sort',
+        ),
+        'argument' => array (
+          'name' => 'views_handler_argument_string',
+        ),
+        'relationship' => array (
+          'name' => 'views_handler_relationship',
+        ),
+      ),
+      'joins' => array (
+      ),
+    ),  
+
   ),
 )
