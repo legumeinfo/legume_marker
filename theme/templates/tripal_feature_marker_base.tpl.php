@@ -325,7 +325,7 @@
   
   // Maps
   if (count($maps) == 0) {
-    $html = "This marker has not placed on any genetic maps";
+    $html = "This marker has not been placed on any genetic maps";
   }
   else {
     $html = "<table><tr>" . implode($maps, '</tr><tr>') . "</tr></table>";
