@@ -38,7 +38,7 @@
   
         $pos['chr']    = $srcfeature->name;
         $pos['ver']    = $row->name;
-        $pos['ver_id'] = $row->analysis_id;
+        $pos['ver_id'] = $row->nid;
         $pos['start']  = $featureloc->fmin;
         $pos['end']    = $featureloc->fmax;
         array_push($phys_pos, $pos);
@@ -68,7 +68,7 @@
         $gbrowse = "[<a href=\"$gbrowse_url$params\">GBrowse</a>]"; 
       }
       
-      $ver = "<a href=\"/analysis/" .  $pos['ver_id'] . "\">"
+      $ver = "<a href=\"/node/" .  $pos['ver_id'] . "\">"
            . $pos['ver'] . "</a>";
            
       $pos_table .= "
