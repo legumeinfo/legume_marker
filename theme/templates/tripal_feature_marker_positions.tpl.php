@@ -19,11 +19,16 @@
     if ($srcfeature = $featureloc->srcfeature_id) {
 //echo "srcfeature: <pre>";var_dump($srcfeature);echo "</pre>";    
       $sql = "
-        SELECT a.name, a.analysis_id, ca.nid FROM chado.feature f
-          INNER JOIN chado.analysisfeature af ON af.feature_id=f.feature_id
+        SELECT a.name, a.analysis_id, ca.nid, chr.name AS chr, x.accession AS browser_chr 
+        FROM chado.feature chr
+          INNER JOIN chado.analysisfeature af ON af.feature_id=chr.feature_id
           INNER JOIN chado.analysis a ON a.analysis_id=af.analysis_id
-          LEFT JOIN public.chado_analysis ca ON ca.analysis_id=a.analysis_id
-        WHERE f.feature_id=" . $srcfeature->feature_id;
+          INNER JOIN chado.feature_dbxref fx ON fx.feature_id=chr.feature_id
+          INNER JOIN chado.dbxref x ON x.dbxref_id=fx.dbxref_id
+          INNER JOIN chado.db ON db.db_id=x.db_id
+          INNER JOIN public.chado_analysis ca ON ca.analysis_id=a.analysis_id
+        WHERE LOWER(db.name) LIKE '%jbrowse%'
+              AND chr.feature_id=" . $srcfeature->feature_id;
       if ($res=chado_query($sql)) {
         $row = $res->fetchObject();
       
@@ -36,12 +41,13 @@
           }
         }
   
-        $pos['chr']     = $srcfeature->name;
-        $pos['ver']     = $row->name;
-        $pos['ver_nid'] = $row->nid;
-        $pos['ver_id']  = $row->analysis_id;
-        $pos['start']   = $featureloc->fmin;
-        $pos['end']     = $featureloc->fmax;
+        $pos['chr']         = $srcfeature->name;
+        $pos['browser_chr'] = $row->browser_chr;
+        $pos['ver']         = $row->name;
+        $pos['ver_nid']     = $row->nid;
+        $pos['ver_id']      = $row->analysis_id;
+        $pos['start']       = $featureloc->fmin;
+        $pos['end']         = $featureloc->fmax;
         array_push($phys_pos, $pos);
       }
     }
@@ -221,13 +227,12 @@ function makeGBrowseParams($feature, $pos) {
   $start = ($pos['start'] > 750) ? $pos['start']-750 : 0;
   $end = $pos['end'] + 750;
   // ?query=ref=Pv09;start=37365723;end=37365923;add=Pv09+Marker+BSn105_SNP+37365823..37365823;h_feat=BSn105_SNP@red;style=Marker+bgcolor=blue
-//eksc- use feature rather than position because chr names are inconsistent between chado
-//      and G/JBrowse.
-//  $params = '?query=ref=' . $pos['chr'] 
+//TODO: switch to location when track name is handled for all markers
+//  $params = '?query=ref=' . $pos['browser_chr'] 
 //          . ";start=$start;stop=$end"
-//          . ';add=' . $pos['chr'] . '+Marker'
 //          . '+' . $feature->name 
 //          . '+' . $pos['start'] . '..' . $pos['end']
+//          . ';type=' . $pos['track_name']
 //          . ';h_feat=' . $feature->name . '@yellow;style=Marker+bgcolor=red'; 
   $params = '?query=q=' . $feature->name;
   return $params;
