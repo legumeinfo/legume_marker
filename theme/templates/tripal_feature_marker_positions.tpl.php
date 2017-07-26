@@ -36,11 +36,12 @@
           }
         }
   
-        $pos['chr']    = $srcfeature->name;
-        $pos['ver']    = $row->name;
-        $pos['ver_id'] = $row->nid;
-        $pos['start']  = $featureloc->fmin;
-        $pos['end']    = $featureloc->fmax;
+        $pos['chr']     = $srcfeature->name;
+        $pos['ver']     = $row->name;
+        $pos['ver_nid'] = $row->nid;
+        $pos['ver_id']  = $row->analysis_id;
+        $pos['start']   = $featureloc->fmin;
+        $pos['end']     = $featureloc->fmax;
         array_push($phys_pos, $pos);
       }
     }
@@ -68,7 +69,7 @@
         $gbrowse = "[<a href=\"$gbrowse_url$params\">GBrowse</a>]"; 
       }
       
-      $ver = "<a href=\"/node/" .  $pos['ver_id'] . "\">"
+      $ver = "<a href=\"/node/" .  $pos['ver_nid'] . "\">"
            . $pos['ver'] . "</a>";
            
       $pos_table .= "
