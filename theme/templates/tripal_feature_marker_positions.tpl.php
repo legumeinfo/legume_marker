@@ -203,7 +203,6 @@ $table = array(
 // function to generate the table.
 print theme_table($table); 
 
-
 function getGBrowseURL($analysis_id) {
   $sql = "
     SELECT value FROM {analysisprop}
@@ -222,14 +221,14 @@ function makeGBrowseParams($feature, $pos) {
   $start = ($pos['start'] > 750) ? $pos['start']-750 : 0;
   $end = $pos['end'] + 750;
   // ?query=ref=Pv09;start=37365723;end=37365923;add=Pv09+Marker+BSn105_SNP+37365823..37365823;h_feat=BSn105_SNP@red;style=Marker+bgcolor=blue
-  $params = '?query=ref=' . $pos['chr'] 
-          . ";start=$start;stop=$end"
-//          . ';add=' . $pos['track_name'] . '+Marker'
-          . ';add=' . $pos['chr'] . '+Marker'
-          . '+' . $feature->name 
-          . '+' . $pos['start'] . '..' . $pos['end']
-          . ';h_feat=' . $feature->name . '@yellow;style=Marker+bgcolor=red'; 
+//eksc- use feature rather than position because chr names are inconsistent between chado
+//      and G/JBrowse.
+//  $params = '?query=ref=' . $pos['chr'] 
+//          . ";start=$start;stop=$end"
+//          . ';add=' . $pos['chr'] . '+Marker'
+//          . '+' . $feature->name 
+//          . '+' . $pos['start'] . '..' . $pos['end']
+//          . ';h_feat=' . $feature->name . '@yellow;style=Marker+bgcolor=red'; 
+  $params = '?query=q=' . $feature->name;
   return $params;
-
-//  return '?q=' . $feature->name;
 }//makeGBrowseParams
