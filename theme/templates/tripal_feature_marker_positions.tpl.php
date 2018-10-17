@@ -211,9 +211,9 @@ print theme_table($table);
 
 function getGBrowseURL($analysis_id) {
   $sql = "
-    SELECT value FROM {analysisprop}
+    SELECT value FROM chado.analysisprop
     WHERE analysis_id=$analysis_id
-          AND type_id=(SELECT cvterm_id FROM {cvterm} WHERE name='GBrowse URL')";
+          AND type_id=(SELECT cvterm_id FROM chado.cvterm WHERE name='GBrowse URL')";
   if ($res=chado_query($sql)) {
     $url_row=$res->fetchObject();
     return $url_row->value;
@@ -234,6 +234,15 @@ function makeGBrowseParams($feature, $pos) {
 //          . '+' . $pos['start'] . '..' . $pos['end']
 //          . ';type=' . $pos['track_name']
 //          . ';h_feat=' . $feature->name . '@yellow;style=Marker+bgcolor=red'; 
-  $params = '?query=q=' . $feature->name;
+
+  // link by name
+//  $params = '?query=q=' . $feature->name;
+
+  // Link by location and highlight feature, if possible (not all markers on browser)
+  $params = '?query=q=' . $pos['browser_chr'] . ':' . "$start..$end"
+          . ';add=' . $pos['browser_chr'] 
+          . '+' . $feature->name . '+marker=' . $pos['start'] . '..' . $pos['end']
+          . ';h_feat=' . $feature->name . '@yellow';
+          
   return $params;
 }//makeGBrowseParams
